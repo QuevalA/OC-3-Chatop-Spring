@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MessageService {
@@ -29,9 +30,9 @@ public class MessageService {
     @PostConstruct
     public void initializeMessages() {
         if (messageRepository.count() == 0) {
-            User user1 = userService.getUserByEmail("user1@example.com");
-            User user2 = userService.getUserByEmail("user2@example.com");
-            User user3 = userService.getUserByEmail("user3@example.com");
+            Optional<User> user1 = userService.getUserByEmail("user1@example.com");
+            Optional<User> user2 = userService.getUserByEmail("user2@example.com");
+            Optional<User> user3 = userService.getUserByEmail("user3@example.com");
 
             Rental rental1 = rentalService.getRentalEntityById(1);
             Rental rental2 = rentalService.getRentalEntityById(2);
@@ -57,7 +58,7 @@ public class MessageService {
             throw new RentalNotFoundException("Rental not found with ID: " + rentalId);
         }
 
-        Message newMessage = new Message(rental, user, messageText);
+        Message newMessage = new Message(rental, Optional.of(user), messageText);
         Message savedMessage = messageRepository.save(newMessage);
 
         return convertToDTO(savedMessage);

@@ -15,8 +15,4 @@ public class UserController {
 
         return "";
     }
-
-    //createUser
-
-    //authenticateUser
 }

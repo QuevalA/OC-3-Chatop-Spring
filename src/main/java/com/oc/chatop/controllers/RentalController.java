@@ -25,6 +25,7 @@ public class RentalController {
 
     @GetMapping
     public List<RentalDTO> getAllRentals() {
+
         return rentalService.getAllRentalsDTO();
     }
 

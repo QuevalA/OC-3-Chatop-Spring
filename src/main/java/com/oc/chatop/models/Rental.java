@@ -2,6 +2,7 @@ package com.oc.chatop.models;
 
 import jakarta.persistence.*;
 import java.sql.Timestamp;
+import java.util.Optional;
 
 @Entity
 @Table(name = "RENTALS")
@@ -41,13 +42,17 @@ public class Rental {
     public Rental() {
     }
 
-    public Rental(String name, Double surface, Double price, String picture, String description, User owner) {
+    public Rental(String name, Double surface, Double price, String picture, String description, Optional<User> owner) {
+        if (owner.isEmpty()) {
+            throw new IllegalArgumentException("Owner is required for creating a Rental");
+        }
+
         this.name = name;
         this.surface = surface;
         this.price = price;
         this.picture = picture;
         this.description = description;
-        this.owner = owner;
+        this.owner = owner.get(); // Access the User from Optional
     }
 
     @PrePersist

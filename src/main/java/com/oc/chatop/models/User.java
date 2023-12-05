@@ -1,12 +1,23 @@
 package com.oc.chatop.models;
 
 import jakarta.persistence.*;
+
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.List;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "USERS")
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,6 +29,12 @@ public class User {
 
     @Column(name = "name")
     private String name;
+
+    @Column(name = "firstname")
+    private String firstname;
+
+    @Column(name = "lastname")
+    private String lastname;
 
     @Column(name = "password")
     private String password;
@@ -34,15 +51,11 @@ public class User {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    // Default constructor required by JPA
-    public User() {
-    }
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
-    public User(String email, String name, String password) {
-        this.email = email;
-        this.name = name;
-        this.password = password;
-    }
+    @OneToMany(mappedBy = "user")
+    private List<Token> tokens;
 
     @PrePersist
     protected void onCreate() {
@@ -54,55 +67,45 @@ public class User {
         updatedAt = new Timestamp(System.currentTimeMillis());
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
+    //Used for fixtures generation, probably temporary
+    public User(String email, String name, String password) {
         this.email = email;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
         this.name = name;
+        this.password = password;
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role.name()));
+    }
+
+    @Override
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    @Override
+    public String getUsername() {
+        return email;
     }
 
-    public List<Rental> getRentals() {
-        return rentals;
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
     }
 
-    public void setRentals(List<Rental> rentals) {
-        this.rentals = rentals;
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
     }
 
-    public List<Message> getMessages() {
-        return messages;
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
     }
 
-    public void setMessages(List<Message> messages) {
-        this.messages = messages;
-    }
-
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-
-    public Timestamp getUpdatedAt() {
-        return updatedAt;
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

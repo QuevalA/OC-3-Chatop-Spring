@@ -26,9 +26,9 @@ public class RentalService {
     @PostConstruct
     public void initializeRentals() {
         if (rentalRepository.count() == 0) {
-            User user1 = userService.getUserByEmail("user1@example.com");
-            User user2 = userService.getUserByEmail("user2@example.com");
-            User user3 = userService.getUserByEmail("user3@example.com");
+            Optional<User> user1 = userService.getUserByEmail("user1@example.com");
+            Optional<User> user2 = userService.getUserByEmail("user2@example.com");
+            Optional<User> user3 = userService.getUserByEmail("user3@example.com");
 
             Rental rental1 = new Rental("House One", 150.0, 1000.0, "house1.jpg", "Spacious house with a garden", user1);
             Rental rental2 = new Rental("Apartment Two", 80.0, 800.0, "apartment2.jpg", "Modern apartment in the city center", user2);
@@ -56,7 +56,7 @@ public class RentalService {
     }
 
     public RentalDTO createRental(String name, Double surface, Double price, String picture, String description, User owner) {
-        Rental newRental = new Rental(name, surface, price, picture, description, owner);
+        Rental newRental = new Rental(name, surface, price, picture, description, Optional.of(owner));
         Rental savedRental = rentalRepository.save(newRental);
         return convertToDTO(savedRental);
     }

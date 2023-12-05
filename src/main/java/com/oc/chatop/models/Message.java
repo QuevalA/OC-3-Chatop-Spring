@@ -2,6 +2,7 @@ package com.oc.chatop.models;
 
 import jakarta.persistence.*;
 import java.sql.Timestamp;
+import java.util.Optional;
 
 @Entity
 @Table(name = "MESSAGES")
@@ -43,9 +44,13 @@ public class Message {
     public Message() {
     }
 
-    public Message(Rental rental, User user, String message) {
+    public Message(Rental rental, Optional<User> user, String message) {
+        if (user.isEmpty()) {
+            throw new IllegalArgumentException("User is required for creating a Message");
+        }
+
         this.rental = rental;
-        this.user = user;
+        this.user = user.get();
         this.message = message;
     }
 
