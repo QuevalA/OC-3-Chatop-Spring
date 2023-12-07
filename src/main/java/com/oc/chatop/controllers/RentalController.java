@@ -1,5 +1,7 @@
 package com.oc.chatop.controllers;
 
+import com.oc.chatop.dto.ApiResponseDTO;
+import com.oc.chatop.dto.ErrorResponseDTO;
 import com.oc.chatop.dto.RentalDTO;
 import com.oc.chatop.models.User;
 import com.oc.chatop.services.RentalService;
@@ -8,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -41,11 +46,11 @@ public class RentalController {
     }
 
     @PostMapping
-    public ResponseEntity<RentalDTO> createRental(
+    public ResponseEntity<ApiResponseDTO> createRental(
             @RequestParam String name,
             @RequestParam Double surface,
             @RequestParam Double price,
-            @RequestParam String picture,
+            @RequestPart MultipartFile pictureFile,
             @RequestParam String description,
             @RequestParam Integer ownerId) {
 
@@ -54,10 +59,17 @@ public class RentalController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        RentalDTO rentalDTO = rentalService.createRental(
-                name, surface, price, picture, description, owner);
+        try {
+            byte[] pictureData = pictureFile.getBytes();
+            RentalDTO rentalDTO = rentalService.createRental(
+                    name, surface, price, pictureData, description, owner);
 
-        return new ResponseEntity<>(rentalDTO, HttpStatus.CREATED);
+            return new ResponseEntity<>(rentalDTO, HttpStatus.CREATED);
+        } catch (IOException e) {
+            e.printStackTrace();
+            ErrorResponseDTO errorResponse = new ErrorResponseDTO("Failed to process the image file.");
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PutMapping("/{id}")

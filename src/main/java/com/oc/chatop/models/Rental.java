@@ -1,9 +1,18 @@
 package com.oc.chatop.models;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.sql.Timestamp;
 import java.util.Optional;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "RENTALS")
 public class Rental {
@@ -22,8 +31,9 @@ public class Rental {
     @Column(name = "price")
     private Double price;
 
-    @Column(name = "picture")
-    private String picture;
+    @Lob
+    @Column(name = "picture", columnDefinition = "BLOB")
+    private byte[] picture;
 
     @Column(name = "description", length = 2000)
     private String description;
@@ -38,11 +48,7 @@ public class Rental {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    // Default constructor required by JPA
-    public Rental() {
-    }
-
-    public Rental(String name, Double surface, Double price, String picture, String description, Optional<User> owner) {
+    public Rental(String name, Double surface, Double price, byte[] picture, String description, Optional<User> owner) {
         if (owner.isEmpty()) {
             throw new IllegalArgumentException("Owner is required for creating a Rental");
         }
@@ -63,65 +69,5 @@ public class Rental {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = new Timestamp(System.currentTimeMillis());
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Double getSurface() {
-        return surface;
-    }
-
-    public void setSurface(Double surface) {
-        this.surface = surface;
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
-    }
-
-    public String getPicture() {
-        return picture;
-    }
-
-    public void setPicture(String picture) {
-        this.picture = picture;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public User getOwner() {
-        return owner;
-    }
-
-    public void setOwner(User owner) {
-        this.owner = owner;
-    }
-
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-
-    public Timestamp getUpdatedAt() {
-        return updatedAt;
     }
 }

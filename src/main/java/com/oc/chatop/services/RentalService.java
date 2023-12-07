@@ -8,6 +8,9 @@ import com.oc.chatop.repositories.RentalRepository;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,12 +33,28 @@ public class RentalService {
             Optional<User> user2 = userService.getUserByEmail("user2@example.com");
             Optional<User> user3 = userService.getUserByEmail("user3@example.com");
 
-            Rental rental1 = new Rental("House One", 150.0, 1000.0, "house1.jpg", "Spacious house with a garden", user1);
-            Rental rental2 = new Rental("Apartment Two", 80.0, 800.0, "apartment2.jpg", "Modern apartment in the city center", user2);
-            Rental rental3 = new Rental("Cottage Three", 120.0, 1200.0, "cottage3.jpg", "Charming cottage near the mountains", user3);
+            byte[] picture1 = loadImageAsBytes("house1.jpg");
+            byte[] picture2 = loadImageAsBytes("apartment2.jpg");
+            byte[] picture3 = loadImageAsBytes("cottage3.jpg");
+
+            Rental rental1 = new Rental("House One", 150.0, 1000.0, picture1, "Spacious house with a garden", user1);
+            Rental rental2 = new Rental("Apartment Two", 80.0, 800.0, picture2, "Modern apartment in the city center", user2);
+            Rental rental3 = new Rental("Cottage Three", 120.0, 1200.0, picture3, "Charming cottage near the mountains", user3);
 
             rentalRepository.saveAll(List.of(rental1, rental2, rental3));
         }
+    }
+
+    private byte[] loadImageAsBytes(String filename) {
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("images/" + filename)) {
+            if (inputStream != null) {
+                return inputStream.readAllBytes();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return new byte[0]; // Return empty array if the image couldn't be loaded
     }
 
     public List<RentalDTO> getAllRentalsDTO() {
@@ -55,7 +74,7 @@ public class RentalService {
         return optionalRental.map(this::convertToDTO).orElse(null);
     }
 
-    public RentalDTO createRental(String name, Double surface, Double price, String picture, String description, User owner) {
+    public RentalDTO createRental(String name, Double surface, Double price, byte[] picture, String description, User owner) {
         Rental newRental = new Rental(name, surface, price, picture, description, Optional.of(owner));
         Rental savedRental = rentalRepository.save(newRental);
         return convertToDTO(savedRental);

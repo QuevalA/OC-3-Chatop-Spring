@@ -1,6 +1,7 @@
 package com.oc.chatop.repositories;
 
 import com.oc.chatop.models.Rental;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
