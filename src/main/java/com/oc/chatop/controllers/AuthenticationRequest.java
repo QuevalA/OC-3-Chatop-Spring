@@ -5,15 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-//ToDo: once feature works, change this file's location for a more logical project structure
-
+//ToDo: reevaluate this file's location relevance
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuthenticationRequest {
 
-    //ToDo: adapt the naming to the project's requirements
+    //ToDo: check the naming according to the project's requirements
     private String email;
     String password;
 }

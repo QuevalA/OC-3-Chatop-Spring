@@ -20,13 +20,13 @@ public class SecurityConfiguration {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
 
-    //ToDo: check code update for Spring Security lastest version and adapt white list routes to my needs
+    //Chercher bonne synthaxe requestMatchers() Spring Secu 6 pour ouvrit seulement /register, /login & /swagger
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req ->
-                        req.requestMatchers("/auth/**")
+                        req.requestMatchers("/auth/register", "/auth/login")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()

@@ -58,8 +58,10 @@ public class User implements UserDetails {
     private List<Token> tokens;
 
     @PrePersist
-    protected void onCreate() {
+    protected void onCreate()
+    {
         createdAt = new Timestamp(System.currentTimeMillis());
+        this.role = Role.USER;
     }
 
     @PreUpdate

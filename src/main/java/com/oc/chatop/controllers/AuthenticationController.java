@@ -1,14 +1,15 @@
 package com.oc.chatop.controllers;
 
+import com.oc.chatop.models.User;
 import com.oc.chatop.services.AuthenticationService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 
-//Remember to check the correct API endpoint route
+//Remember to check the correct API endpoint route (project's requirements)
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -23,11 +24,19 @@ public class AuthenticationController {
         return ResponseEntity.ok(service.register(request));
     }
 
-    //ToDo: rename "authenticate" to "login" everywhere needed once feature is working
-    @PostMapping("/authenticate")
+    //ToDo: rename "authenticate" to "login" everywhere needed (project's requirements)
+    @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> authenticate(
             @RequestBody AuthenticationRequest request
     ) {
         return ResponseEntity.ok(service.authenticate(request));
+    }
+
+    //Ebauche
+    @GetMapping("/me")
+    public ResponseEntity<String> getMe() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        return ResponseEntity.ok(authentication.getName());
     }
 }
