@@ -27,13 +27,14 @@ public class MessageService {
         this.rentalService = rentalService;
     }
 
-    @PostConstruct
+    /*@PostConstruct
     public void initializeMessages() {
         if (messageRepository.count() == 0) {
             Optional<User> user1 = userService.getUserByEmail("user1@example.com");
             Optional<User> user2 = userService.getUserByEmail("user2@example.com");
             Optional<User> user3 = userService.getUserByEmail("user3@example.com");
 
+            //ToDo: Improve to find Rental fixtures dynamically like it's done to find User fixtures
             Rental rental1 = rentalService.getRentalEntityById(1);
             Rental rental2 = rentalService.getRentalEntityById(2);
             Rental rental3 = rentalService.getRentalEntityById(3);
@@ -44,10 +45,38 @@ public class MessageService {
 
             messageRepository.saveAll(List.of(message1, message2, message3));
         }
+    }*/
+
+    @PostConstruct
+    public void initializeMessages() {
+        if (messageRepository.count() == 0) {
+            Optional<User> user1 = userService.getUserByEmail("user1@example.com");
+            Optional<User> user2 = userService.getUserByEmail("user2@example.com");
+            Optional<User> user3 = userService.getUserByEmail("user3@example.com");
+
+            user1.ifPresent(u -> {
+                List<Rental> user1Rentals = rentalService.getRentalsByOwnerId(u.getId());
+                user1Rentals.stream().findFirst().ifPresent(rental1 ->
+                        messageRepository.save(new Message(rental1, user2, "Interested in renting this property")));
+            });
+
+            user2.ifPresent(u -> {
+                List<Rental> user2Rentals = rentalService.getRentalsByOwnerId(u.getId());
+                user2Rentals.stream().findFirst().ifPresent(rental2 ->
+                        messageRepository.save(new Message(rental2, user3, "When can I schedule a visit?")));
+            });
+
+            user3.ifPresent(u -> {
+                List<Rental> user3Rentals = rentalService.getRentalsByOwnerId(u.getId());
+                user3Rentals.stream().findFirst().ifPresent(rental3 ->
+                        messageRepository.save(new Message(rental3, user1, "Is the property pet-friendly?")));
+            });
+        }
     }
 
+
     public MessageDTO createMessage(String messageText, Integer userId, Integer rentalId) {
-        User user = userService.getUserEntityById(userId);
+        Optional<User> user = userService.getUserEntityById(userId);
         Rental rental = rentalService.getRentalEntityById(rentalId);
 
         if (user == null) {
@@ -58,7 +87,7 @@ public class MessageService {
             throw new RentalNotFoundException("Rental not found with ID: " + rentalId);
         }
 
-        Message newMessage = new Message(rental, Optional.of(user), messageText);
+        Message newMessage = new Message(rental, user, messageText);
         Message savedMessage = messageRepository.save(newMessage);
 
         return convertToDTO(savedMessage);
@@ -66,9 +95,11 @@ public class MessageService {
 
     private MessageDTO convertToDTO(Message message) {
         MessageDTO messageDTO = new MessageDTO();
+        messageDTO.setId(message.getId());
         messageDTO.setRentalId(message.getRental().getId());
         messageDTO.setUserId(message.getUser().getId());
         messageDTO.setMessage(message.getMessage());
+
         return messageDTO;
     }
 }

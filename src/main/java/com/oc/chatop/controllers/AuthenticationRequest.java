@@ -13,6 +13,6 @@ import lombok.NoArgsConstructor;
 public class AuthenticationRequest {
 
     //ToDo: check the naming according to the project's requirements
-    private String email;
+    private String login;
     String password;
 }

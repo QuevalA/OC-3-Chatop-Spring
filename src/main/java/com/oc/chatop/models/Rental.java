@@ -31,9 +31,8 @@ public class Rental {
     @Column(name = "price")
     private Double price;
 
-    @Lob
-    @Column(name = "picture", columnDefinition = "BLOB")
-    private byte[] picture;
+    @Column(name = "picture", columnDefinition = "TEXT")
+    private String picture;
 
     @Column(name = "description", length = 2000)
     private String description;
@@ -48,7 +47,7 @@ public class Rental {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    public Rental(String name, Double surface, Double price, byte[] picture, String description, Optional<User> owner) {
+    public Rental(String name, Double surface, Double price, String picture, String description, Optional<User> owner) {
         if (owner.isEmpty()) {
             throw new IllegalArgumentException("Owner is required for creating a Rental");
         }
@@ -64,6 +63,7 @@ public class Rental {
     @PrePersist
     protected void onCreate() {
         createdAt = new Timestamp(System.currentTimeMillis());
+        updatedAt = createdAt;
     }
 
     @PreUpdate

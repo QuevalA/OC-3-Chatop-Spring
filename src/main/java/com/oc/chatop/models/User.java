@@ -1,5 +1,6 @@
 package com.oc.chatop.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import lombok.*;
@@ -40,6 +41,7 @@ public class User implements UserDetails {
     private String password;
 
     @OneToMany(mappedBy = "owner")
+    @JsonIgnore
     private List<Rental> rentals;
 
     @OneToMany(mappedBy = "user")
@@ -61,7 +63,13 @@ public class User implements UserDetails {
     protected void onCreate()
     {
         createdAt = new Timestamp(System.currentTimeMillis());
+        updatedAt = createdAt;
         this.role = Role.USER;
+
+        //Temporary adjustments from security config to API structure
+        name = (name != null) ? name : (firstname != null && lastname != null) ? firstname + " " + lastname : "";
+        firstname = (firstname != null) ? firstname : name + " firstname";
+        lastname = (lastname != null) ? lastname : name + " lasstname";
     }
 
     @PreUpdate

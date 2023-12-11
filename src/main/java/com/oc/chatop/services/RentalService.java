@@ -5,14 +5,21 @@ import com.oc.chatop.exceptions.RentalNotFoundException;
 import com.oc.chatop.models.Rental;
 import com.oc.chatop.models.User;
 import com.oc.chatop.repositories.RentalRepository;
+
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Optional;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +33,18 @@ public class RentalService {
         this.userService = userService;
     }
 
+    private String getPlaceholderImageUrl() {
+        Resource resource = new ClassPathResource("images/placeholder-rental-property-1.txt");
+
+        try {
+            byte[] encoded = Files.readAllBytes(Paths.get(resource.getURI()));
+            return new String(encoded);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to read placeholder image file.", e);
+        }
+    }
+
     @PostConstruct
     public void initializeRentals() {
         if (rentalRepository.count() == 0) {
@@ -33,35 +52,26 @@ public class RentalService {
             Optional<User> user2 = userService.getUserByEmail("user2@example.com");
             Optional<User> user3 = userService.getUserByEmail("user3@example.com");
 
-            byte[] picture1 = loadImageAsBytes("house1.jpg");
-            byte[] picture2 = loadImageAsBytes("apartment2.jpg");
-            byte[] picture3 = loadImageAsBytes("cottage3.jpg");
+            String placeholderImageUrl = getPlaceholderImageUrl();
 
-            Rental rental1 = new Rental("House One", 150.0, 1000.0, picture1, "Spacious house with a garden", user1);
-            Rental rental2 = new Rental("Apartment Two", 80.0, 800.0, picture2, "Modern apartment in the city center", user2);
-            Rental rental3 = new Rental("Cottage Three", 120.0, 1200.0, picture3, "Charming cottage near the mountains", user3);
+            Rental rental1 = new Rental("House One", 150.0, 1000.0, placeholderImageUrl, "Spacious house with a garden", user1);
+            Rental rental2 = new Rental("Apartment Two", 80.0, 800.0, placeholderImageUrl, "Modern apartment in the city center", user2);
+            Rental rental3 = new Rental("Cottage Three", 120.0, 1200.0, placeholderImageUrl, "Charming cottage near the mountains", user3);
 
             rentalRepository.saveAll(List.of(rental1, rental2, rental3));
         }
     }
 
-    private byte[] loadImageAsBytes(String filename) {
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("images/" + filename)) {
-            if (inputStream != null) {
-                return inputStream.readAllBytes();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return new byte[0]; // Return empty array if the image couldn't be loaded
-    }
-
-    public List<RentalDTO> getAllRentalsDTO() {
+    public Map<String, List<RentalDTO>> getAllRentalsDTO() {
         List<Rental> rentals = rentalRepository.findAll();
-        return rentals.stream()
+        List<RentalDTO> rentalDTOs = rentals.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
+
+        Map<String, List<RentalDTO>> response = new HashMap<>();
+        response.put("rentals", rentalDTOs);
+
+        return response;
     }
 
     public Rental getRentalEntityById(Integer id) {
@@ -74,13 +84,35 @@ public class RentalService {
         return optionalRental.map(this::convertToDTO).orElse(null);
     }
 
-    public RentalDTO createRental(String name, Double surface, Double price, byte[] picture, String description, User owner) {
-        Rental newRental = new Rental(name, surface, price, picture, description, Optional.of(owner));
-        Rental savedRental = rentalRepository.save(newRental);
-        return convertToDTO(savedRental);
+    public RentalDTO createRental(String name, Double surface, Double price, MultipartFile pictureFile, String description, Optional<User> owner) {
+        try {
+            String base64Image = encodeImageToBase64(pictureFile.getBytes());
+            String dataUrl = "data:image/jpeg;base64," + base64Image;
+            Rental newRental = new Rental(name, surface, price, dataUrl, description, owner);
+            Rental savedRental = rentalRepository.save(newRental);
+
+            return convertToDTO(savedRental);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to encode image to Base64.", e);
+        }
     }
 
-    public RentalDTO updateRental(Integer id, String name, Double surface, Double price, String description) {
+    private String encodeImageToBase64(byte[] imageBytes) {
+        return Base64.getEncoder().encodeToString(imageBytes);
+    }
+
+    public byte[] loadImageAsBytes(String base64Image) {
+        return Base64.getDecoder().decode(base64Image);
+    }
+
+    public RentalDTO updateRental(
+            Integer id,
+            String name,
+            Double surface,
+            Double price,
+            String description) {
+
         Optional<Rental> optionalRental = rentalRepository.findById(id);
 
         Rental rental = optionalRental.orElseThrow(() -> new RentalNotFoundException("Rental not found"));
@@ -95,15 +127,22 @@ public class RentalService {
         return convertToDTO(updatedRental);
     }
 
+    public List<Rental> getRentalsByOwnerId(Integer ownerId) {
+        return rentalRepository.findByOwnerId(ownerId);
+    }
+
     private RentalDTO convertToDTO(Rental rental) {
         RentalDTO rentalDTO = new RentalDTO();
         rentalDTO.setId(rental.getId());
         rentalDTO.setName(rental.getName());
         rentalDTO.setSurface(rental.getSurface());
         rentalDTO.setPrice(rental.getPrice());
-        rentalDTO.setPicture(rental.getPicture());
         rentalDTO.setDescription(rental.getDescription());
-        rentalDTO.setOwnerId(rental.getOwner().getId());
+        rentalDTO.setOwner_id(rental.getOwner().getId());
+        rentalDTO.setCreated_at(rental.getCreatedAt());
+        rentalDTO.setUpdated_at(rental.getUpdatedAt());
+        rentalDTO.setPicture(rental.getPicture());
+
         return rentalDTO;
     }
 }

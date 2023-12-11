@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface RentalRepository extends JpaRepository<Rental, Integer> {
     List<Rental> findAll();
     Optional<Rental> findById(Integer id);
+    List<Rental> findByOwnerId(Integer ownerId);
 }
