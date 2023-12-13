@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-//ToDo: reevaluate this file's location relevance
 @Service
 public class JwtService {
 

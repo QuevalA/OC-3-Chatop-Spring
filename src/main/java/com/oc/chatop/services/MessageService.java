@@ -7,6 +7,7 @@ import com.oc.chatop.models.Message;
 import com.oc.chatop.models.Rental;
 import com.oc.chatop.models.User;
 import com.oc.chatop.repositories.MessageRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
@@ -26,26 +27,6 @@ public class MessageService {
         this.userService = userService;
         this.rentalService = rentalService;
     }
-
-    /*@PostConstruct
-    public void initializeMessages() {
-        if (messageRepository.count() == 0) {
-            Optional<User> user1 = userService.getUserByEmail("user1@example.com");
-            Optional<User> user2 = userService.getUserByEmail("user2@example.com");
-            Optional<User> user3 = userService.getUserByEmail("user3@example.com");
-
-            //ToDo: Improve to find Rental fixtures dynamically like it's done to find User fixtures
-            Rental rental1 = rentalService.getRentalEntityById(1);
-            Rental rental2 = rentalService.getRentalEntityById(2);
-            Rental rental3 = rentalService.getRentalEntityById(3);
-
-            Message message1 = new Message(rental1, user2, "Interested in renting this property");
-            Message message2 = new Message(rental2, user3, "When can I schedule a visit?");
-            Message message3 = new Message(rental3, user1, "Is the property pet-friendly?");
-
-            messageRepository.saveAll(List.of(message1, message2, message3));
-        }
-    }*/
 
     @PostConstruct
     public void initializeMessages() {

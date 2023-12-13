@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-//ToDo: reevaluate this file's location relevance
 @Data
 @Builder
 @AllArgsConstructor

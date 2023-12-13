@@ -1,7 +1,6 @@
 package com.oc.chatop.controllers;
 
 import com.oc.chatop.dto.UserResponseDTO;
-import com.oc.chatop.models.User;
 import com.oc.chatop.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

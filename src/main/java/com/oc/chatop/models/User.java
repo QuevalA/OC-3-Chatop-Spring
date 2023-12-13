@@ -69,7 +69,7 @@ public class User implements UserDetails {
         //Temporary adjustments from security config to API structure
         name = (name != null) ? name : (firstname != null && lastname != null) ? firstname + " " + lastname : "";
         firstname = (firstname != null) ? firstname : name + " firstname";
-        lastname = (lastname != null) ? lastname : name + " lasstname";
+        lastname = (lastname != null) ? lastname : name + " lastname";
     }
 
     @PreUpdate

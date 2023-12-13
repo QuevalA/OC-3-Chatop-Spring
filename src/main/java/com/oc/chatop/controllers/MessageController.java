@@ -1,10 +1,9 @@
 package com.oc.chatop.controllers;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.oc.chatop.dto.MessageDTO;
 import com.oc.chatop.models.User;
 import com.oc.chatop.services.MessageService;
-import com.oc.chatop.services.UserService;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,37 +14,21 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/messages")
 public class MessageController {
     private final MessageService messageService;
-    private final UserService userService;
 
     @Autowired
-    public MessageController(MessageService messageService, UserService userService) {
+    public MessageController(MessageService messageService) {
         this.messageService = messageService;
-        this.userService = userService;
     }
 
-    /*@PostMapping
-    public ResponseEntity<MessageDTO> createMessage(@RequestBody CreateMessageRequest request) {
-        try {
-            MessageDTO createdMessage = messageService.createMessage(
-                    request.getMessage(),
-                    request.getUserId(),
-                    request.getRentalId()
-            );
-
-            return new ResponseEntity<>(createdMessage, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }*/
-
     @PostMapping
-    public ResponseEntity<MessageDTO> createMessage(@RequestBody CreateMessageRequest request) {
+    public ResponseEntity<Map<String, String>> createMessage(@RequestBody CreateMessageRequest request) {
         try {
             // Retrieve the authenticated user's principal from SecurityContextHolder
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -59,13 +42,13 @@ public class MessageController {
             Integer loggedInUserId = user.getId();
 
             // Call the service method with the authenticated user's ID
-            MessageDTO createdMessage = messageService.createMessage(
-                    request.getMessage(),
-                    loggedInUserId,  // Pass the authenticated user's ID
-                    request.getRentalId()
-            );
+            messageService.createMessage(request.getMessage(), loggedInUserId, request.getRentalId());
 
-            return new ResponseEntity<>(createdMessage, HttpStatus.CREATED);
+            // Create a custom response message
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Message sent with success");
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -83,17 +66,8 @@ public class MessageController {
             return message;
         }
 
-        public void setMessage(String message) {
-            this.message = message;
-        }
-
-
         public Integer getRentalId() {
             return rentalId;
-        }
-
-        public void setRentalId(Integer rentalId) {
-            this.rentalId = rentalId;
         }
     }
 }

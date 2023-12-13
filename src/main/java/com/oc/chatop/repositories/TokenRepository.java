@@ -1,9 +1,9 @@
 package com.oc.chatop.repositories;
 
+import com.oc.chatop.models.Token;
+
 import java.util.List;
 import java.util.Optional;
-
-import com.oc.chatop.models.Token;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

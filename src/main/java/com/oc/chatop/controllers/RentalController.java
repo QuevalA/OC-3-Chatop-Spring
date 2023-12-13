@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -52,7 +53,7 @@ public class RentalController {
     }
 
     @PostMapping
-    public ResponseEntity<RentalDTO> createRental(
+    public ResponseEntity<Map<String, String>> createRental(
             @RequestParam String name,
             @RequestParam Double surface,
             @RequestParam Double price,
@@ -72,21 +73,27 @@ public class RentalController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        RentalDTO rentalDTO = rentalService.createRental(
-                name, surface, price, picture, description, owner);
+        rentalService.createRental(name, surface, price, picture, description, owner);
 
-        return new ResponseEntity<>(rentalDTO, HttpStatus.CREATED);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Rental created!");
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RentalDTO> updateRental(
+    public ResponseEntity<Map<String, String>> updateRental(
             @PathVariable Integer id,
             @RequestParam String name,
             @RequestParam Double surface,
             @RequestParam Double price,
             @RequestParam String description) {
 
-        return new ResponseEntity<>(rentalService.updateRental
-                (id, name, surface, price, description), HttpStatus.OK);
+        rentalService.updateRental(id, name, surface, price, description);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Rental updated!");
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
