@@ -14,7 +14,7 @@ This project was generated with [Spring Initializr](https://start.spring.io/).
 * Apache Maven 3.9.5
 
 #### Run the application with Maven
-1. From the project root location, execute Maven Goal _spring-boot:run_ : `./mvnw spring-boot:run`
+1. From the project root location, execute `mvn spring-boot:run` (make sure the environment variables from application.properties can be resolved)
 2. API is accessible at : http://localhost:{SERVER_PORT}/api/
 3. Swagger UI can be viewed at : http://localhost:{SERVER_PORT}/doc/swagger-ui.html
 
