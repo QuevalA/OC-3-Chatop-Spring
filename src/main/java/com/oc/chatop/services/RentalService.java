@@ -98,10 +98,6 @@ public class RentalService {
         return Base64.getEncoder().encodeToString(imageBytes);
     }
 
-    public byte[] loadImageAsBytes(String base64Image) {
-        return Base64.getDecoder().decode(base64Image);
-    }
-
     public RentalDTO updateRental(
             Integer id,
             String name,

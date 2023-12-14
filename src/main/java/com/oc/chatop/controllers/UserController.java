@@ -2,6 +2,9 @@ package com.oc.chatop.controllers;
 
 import com.oc.chatop.dto.UserResponseDTO;
 import com.oc.chatop.services.UserService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +22,7 @@ public class UserController {
         this.userService = userService;
     }
 
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     @GetMapping("/{id}")
     public UserResponseDTO getUserById(@PathVariable Integer id) {
         return userService.getUserEntityById(id)

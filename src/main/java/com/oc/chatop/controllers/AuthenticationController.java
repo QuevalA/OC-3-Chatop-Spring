@@ -4,7 +4,8 @@ import com.oc.chatop.dto.MeResponseDTO;
 import com.oc.chatop.models.User;
 import com.oc.chatop.services.AuthenticationService;
 
-import com.oc.chatop.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,8 +17,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -26,8 +25,8 @@ import java.util.Map;
 public class AuthenticationController {
 
     private final AuthenticationService service;
-    private final UserService userService;
 
+    @Operation(summary = "Register a new user")
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
             @Valid @RequestBody RegisterRequest request
@@ -41,6 +40,7 @@ public class AuthenticationController {
         return ResponseEntity.badRequest().build();
     }
 
+    @Operation(summary = "Authenticate a user")
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> authenticate(
             @RequestBody AuthenticationRequest request
@@ -58,6 +58,10 @@ public class AuthenticationController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"message\":\"error\"}");
     }
 
+    @Operation(
+            summary = "Get information about the authenticated user",
+            security = { @SecurityRequirement(name = "bearer-key") }
+    )
     @GetMapping("/me")
     public ResponseEntity<MeResponseDTO> getMe() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

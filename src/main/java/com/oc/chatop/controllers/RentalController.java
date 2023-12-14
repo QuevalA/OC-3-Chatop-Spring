@@ -1,22 +1,19 @@
 package com.oc.chatop.controllers;
 
-import com.oc.chatop.dto.ApiResponseDTO;
-import com.oc.chatop.dto.ErrorResponseDTO;
 import com.oc.chatop.dto.RentalDTO;
-import com.oc.chatop.models.Rental;
 import com.oc.chatop.models.User;
 import com.oc.chatop.services.RentalService;
 import com.oc.chatop.services.UserService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,12 +32,14 @@ public class RentalController {
         this.userService = userService;
     }
 
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     @GetMapping
     public ResponseEntity<Map<String, List<RentalDTO>>> getAllRentalsDTO() {
         Map<String, List<RentalDTO>> response = rentalService.getAllRentalsDTO();
         return ResponseEntity.ok(response);
     }
 
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     @GetMapping("/{id}")
     public ResponseEntity<RentalDTO> getRentalById(@PathVariable Integer id) {
         RentalDTO rentalDTO = rentalService.getRentalDTOById(id);
@@ -52,6 +51,7 @@ public class RentalController {
         }
     }
 
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     @PostMapping
     public ResponseEntity<Map<String, String>> createRental(
             @RequestParam String name,
@@ -81,6 +81,7 @@ public class RentalController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     @PutMapping("/{id}")
     public ResponseEntity<Map<String, String>> updateRental(
             @PathVariable Integer id,

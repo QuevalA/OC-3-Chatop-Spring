@@ -4,6 +4,8 @@ import com.oc.chatop.models.User;
 import com.oc.chatop.services.MessageService;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,7 @@ public class MessageController {
         this.messageService = messageService;
     }
 
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     @PostMapping
     public ResponseEntity<Map<String, String>> createMessage(@RequestBody CreateMessageRequest request) {
         try {
